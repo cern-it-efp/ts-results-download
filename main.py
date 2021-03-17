@@ -23,6 +23,10 @@ def getFile(presignedURL, destination):
     # Make request
     res = requests.get(presignedURL)
 
+    # Check response code
+    if res.status_code != 200:
+        return False
+
     # Get filename
     filename = getOriginalFilename(res.headers,presignedURL)
 
@@ -56,8 +60,10 @@ for presignedURL in open(args.pathPresignedURLs).readlines():
     print("Getting file from: %s..." % presignedURL[:100])
 
     try:
-        getFile(presignedURL,args.destination)
-        print("   OK")
+        if getFile(presignedURL,args.destination) == False:
+            print("   ERROR: unable to get file from: %s..." % presignedURL[:100])
+        else:
+            print("   OK")
     except BaseException as ex:
         print("   ERROR: unable to get file from: %s..." % presignedURL[:100])
         print(ex)
